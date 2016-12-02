@@ -6,5 +6,5 @@ description   = "A fork of \"stopwatch\" that adds more features"
 license       = "MIT"
 
 [Deps]
-Requires: "nim >= 0.10.0"
+Requires: "nim >= 0.15.0"
 
