@@ -5,7 +5,6 @@ type
   Stopwatch* = object
     running: bool
     startTicks: Nanos 
-    stop: Nanos
     laps: seq[Nanos]
 
 
@@ -14,17 +13,35 @@ proc newStopwatch*(): Stopwatch
 proc running*(sw: var Stopwatch): bool {.inline.}
 proc start*(sw: var Stopwatch) {.inline.}
 proc stop*(sw: var Stopwatch) {.inline.}
+
+# TODO lap functions
+# lap(int) -> single compleded laps   # TODO: flag to include current lap?
+# laps() -> all completed laps
+# numLaps() -> count of completed laps
+
+
+# These functions are for the current lap (or alst one if not running)
+#  TODO fix them up
 proc nsecs*(sw: var Stopwatch): int64 {.inline.}
 #proc usecs*(sw: var Stopwatch): int64 {.inline.}
 #proc msecs*(sw var Stopwatch): int64 {.inline.}
 proc secs*(sw: var Stopwatch): float {.inline.}
+
+# These functions include the time for all laps (plus the current lap, if there is one)
+#proc totalNsecs*(sw: var Stopwatch): int64 {.inline.}
+##proc totalUsecs*(sw: var Stopwatch): int64 {.inline.}
+##proc totalMsecs*(sw var Stopwatch): int64 {.inline.}
+#proc totalSecs*(sw: var Stopwatch): float {.inline.}
+
+
+# TODO function for the done laps only?
 
 
 # TODO document
 proc newStopwatch*(): Stopwatch =
   result = Stopwatch(
     running: false,
-    stop: 0,
+    startTicks: 0
     laps: @[]
   )
 
@@ -41,13 +58,25 @@ proc start*(sw: var Stopwatch) =
   if sw.running:
     return
 
-  # 
-
+  # Start the lap
+  sw.running = true
   sw.startTicks = getTicks().Nanos
 
 
 proc stop*(sw: var Stopwatch) =
-  sw.stop = getTicks().Nanos
+  # First thing, measure the time
+  var stopTicks = getTicks().Nanos
+
+  # If not running, ignore
+  if not sw.running:
+    return
+
+  # save the lap that we just made
+  sw.laps.add(stopTicks - sw.startTicks)
+
+  # Reset timer state
+  sw.running = false
+  sw.startTicks = 0
 
 
 proc nsecs*(sw: var Stopwatch): int64 =
