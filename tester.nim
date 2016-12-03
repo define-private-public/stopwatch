@@ -3,8 +3,11 @@ from os import sleep
 
 var sw = newStopwatch()
 
+echo "total=", sw.totalSecs
+
 sw.start()
 sleep(1000)
+echo "total=", sw.totalSecs
 sw.stop()
 
 echo sw.secs
