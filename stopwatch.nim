@@ -2,13 +2,10 @@ include system/timers
 
 
 type
-  Stopwatch* = object
-    running: bool
-    start: int64
-    stop: int64
-
-
-{.deprecated: [clock: Stopwatch].}
+  Stopwatch* = ref object
+    running*: bool
+    start*: Nanos 
+    stop*: Nanos 
 
 
 # TODO document
@@ -30,12 +27,25 @@ proc stop*(sw: var Stopwatch) {.inline.} =
   sw.stop = getTicks().Nanos
 
 
-proc nanoseconds*(sw: Stopwatch): int64 {.inline.} =
-  return (sw.stop - sw.start)
+proc nsecs*(sw: var Stopwatch): int64 {.inline.} =
+  return (sw.stop - sw.start).int64
 
 
-proc seconds*(sw: Stopwatch): float {.inline.} =
-  return sw.nanoseconds / 1_000_000_000.0
+#proc usecs*(sw: var Stopwatch): int64 {.inline.} =
+#  return sw.nsecs / 1_000.int64
+#
+#
+#proc msecs*(sw var Stopwatch): int64 {.inline.} =
+#  return sw.nsecs / 1_000_000.int64
+
+
+proc secs*(sw: var Stopwatch): float {.inline.} =
+  return sw.nsecs.float / 1_000_000_000.0
+
+
+{.deprecated: [clock: Stopwatch].}
+{.deprecated: [nanoseconds: nsecs].}
+{.deprecated: [seconds: secs].}
 
 
 #template bench*(sw: Stopwatch, body: stmt): stmt {.immediate.} =
