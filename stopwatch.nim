@@ -20,7 +20,7 @@ proc stop*(sw: var Stopwatch) {.inline.}
 # numLaps() -> count of completed laps
 
 
-# These functions are for the current lap (or alst one if not running)
+# These functions are for the current lap (or previous one if not running)
 #  TODO fix them up
 proc nsecs*(sw: var Stopwatch): int64 {.inline.}
 #proc usecs*(sw: var Stopwatch): int64 {.inline.}
@@ -41,7 +41,7 @@ proc secs*(sw: var Stopwatch): float {.inline.}
 proc newStopwatch*(): Stopwatch =
   result = Stopwatch(
     running: false,
-    startTicks: 0
+    startTicks: 0,
     laps: @[]
   )
 
@@ -65,7 +65,7 @@ proc start*(sw: var Stopwatch) =
 
 proc stop*(sw: var Stopwatch) =
   # First thing, measure the time
-  var stopTicks = getTicks().Nanos
+  let stopTicks = getTicks().Nanos
 
   # If not running, ignore
   if not sw.running:
@@ -80,7 +80,14 @@ proc stop*(sw: var Stopwatch) =
 
 
 proc nsecs*(sw: var Stopwatch): int64 =
-  return (sw.stop - sw.startTicks).int64
+  let curTicks = getTicks().Nanos
+
+  if sw.running:
+    # Return current lap
+    return (curTicks - sw.startTicks).int64
+  else:
+    # Return previous lap
+    return sw.laps[high(sw.laps)].int64
 
 
 #proc usecs*(sw: var Stopwatch): int64 =
