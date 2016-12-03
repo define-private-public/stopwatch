@@ -1,4 +1,5 @@
 include system/timers
+from sequtils import foldl
 
 
 type
@@ -28,10 +29,10 @@ proc nsecs*(sw: var Stopwatch): int64 {.inline.}
 proc secs*(sw: var Stopwatch): float {.inline.}
 
 # These functions include the time for all laps (plus the current lap, if there is one)
-#proc totalNsecs*(sw: var Stopwatch): int64 {.inline.}
-##proc totalUsecs*(sw: var Stopwatch): int64 {.inline.}
-##proc totalMsecs*(sw var Stopwatch): int64 {.inline.}
-#proc totalSecs*(sw: var Stopwatch): float {.inline.}
+proc totalNsecs*(sw: var Stopwatch): int64 {.inline.}
+#proc totalUsecs*(sw: var Stopwatch): int64 {.inline.}
+#proc totalMsecs*(sw var Stopwatch): int64 {.inline.}
+proc totalSecs*(sw: var Stopwatch): float {.inline.}
 
 
 
@@ -98,6 +99,22 @@ proc nsecs*(sw: var Stopwatch): int64 =
 
 proc secs*(sw: var Stopwatch): float =
   return sw.nsecs.float / 1_000_000_000.0
+
+
+# These functions include the time for all laps (plus the current lap, if there is one)
+proc totalNsecs*(sw: var Stopwatch): int64 =
+  let curTicks = getTicks().Nanos
+  let total = foldl(sw.laps, a + b)
+
+  if sw.running:
+    # Return total + current lap
+    return (total + (curTicks - sw.startTicks)).int64
+  else:
+    return total.int64
+
+
+proc totalSecs*(sw: var Stopwatch): float =
+  return sw.totalNsecs.float / 1_000_000_000.0
 
 
 {.deprecated: [clock: Stopwatch].}
