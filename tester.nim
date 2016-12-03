@@ -4,7 +4,7 @@ from os import sleep
 var sw = newStopwatch()
 
 sw.start()
-sleep(1)
+sleep(1000)
 sw.stop()
 
 echo sw.secs

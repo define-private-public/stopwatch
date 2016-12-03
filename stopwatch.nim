@@ -20,6 +20,10 @@ proc newStopwatch*(): Stopwatch =
 # TODO clone/copy constructor
 
 
+proc running*(sw: var Stopwatch): bool {.inline.} =
+  return sw.running
+
+
 proc start*(sw: var Stopwatch) {.inline.} =
   sw.start = getTicks().Nanos
 
