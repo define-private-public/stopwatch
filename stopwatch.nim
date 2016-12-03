@@ -2,18 +2,19 @@ include system/timers
 
 
 type
-  Stopwatch* = ref object
-    running*: bool
-    start*: Nanos 
-    stop*: Nanos 
+  Stopwatch* = object
+    running: bool
+    start: Nanos 
+    stop: Nanos 
 
 
 # TODO document
 proc newStopwatch*(): Stopwatch =
-  new(result)
-  result.running = false
-  result.start = 0
-  result.stop = 0
+  result = Stopwatch(
+    running: false,
+    start: 0,
+    stop: 0
+  )
 
 
 # TODO clone/copy constructor
