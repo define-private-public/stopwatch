@@ -34,8 +34,6 @@ proc secs*(sw: var Stopwatch): float {.inline.}
 #proc totalSecs*(sw: var Stopwatch): float {.inline.}
 
 
-# TODO function for the done laps only?
-
 
 # TODO document
 proc newStopwatch*(): Stopwatch =
