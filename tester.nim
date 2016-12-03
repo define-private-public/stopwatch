@@ -39,7 +39,15 @@ echo sw.secs
 sleep(100)
 sw.stop()
 echo sw.secs
+echo "total=", sw.totalSecs
 echo ""
 
+sw.reset()
+sw.start()
+sleep(10)
+echo "total=", sw.totalSecs
+sw.restart()
+echo "total=", sw.totalSecs
+sleep(250)
 echo "total=", sw.totalSecs
 

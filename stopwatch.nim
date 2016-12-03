@@ -11,14 +11,21 @@ type
 
 # Function prototypes
 proc newStopwatch*(): Stopwatch
+#proc clone*(): Stopwatch
 proc running*(sw: var Stopwatch): bool {.inline.}
 proc start*(sw: var Stopwatch) {.inline.}
 proc stop*(sw: var Stopwatch) {.inline.}
+proc reset*(sw: var Stopwatch) {.inline.}
+proc restart*(sw: var Stopwatch) {.inline.}
+
 
 # TODO lap functions
-# lap(int) -> single compleded laps   # TODO: flag to include current lap?
-# laps() -> all completed laps
-# numLaps() -> count of completed laps
+# numLaps() -> count of laps      (flag to include current, if there is one)
+# lap(int, bool) -> single laps   (flag to include current, if there is one)
+# laps(bool) -> all laps          (flag to include current, if there is one)
+# rmLap(int) -> remove a lap by index, doesn't modify current lap
+# clearLaps() -> remove all laps, doesn't modify current lap
+
 
 
 # These functions are for the current lap (or previous one if not running)
@@ -76,6 +83,19 @@ proc stop*(sw: var Stopwatch) =
   # Reset timer state
   sw.running = false
   sw.startTicks = 0
+
+
+# TODO document
+proc reset*(sw: var Stopwatch) =
+  sw.running = false
+  sw.startTicks = 0
+  sw.laps.setLen(0)   # Clear the laps
+
+
+# TODO document
+proc restart*(sw: var Stopwatch) =
+  sw.reset()
+  sw.start()
 
 
 proc nsecs*(sw: var Stopwatch): int64 =
