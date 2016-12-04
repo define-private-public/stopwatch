@@ -2,6 +2,12 @@ include system/timers
 from sequtils import foldl
 
 
+# TODO find a better place for this
+# TODO ones for usecs and msecs
+proc secs*(nsecs: int64): float {.inline.} =
+  return nsecs.float / 1_000_000_000.0
+
+
 type
   Stopwatch* = object
     running: bool
@@ -11,24 +17,23 @@ type
 
 # Function prototypes
 proc newStopwatch*(): Stopwatch
-#proc clone*(): Stopwatch
+proc clone*(sw: var Stopwatch): Stopwatch
 proc running*(sw: var Stopwatch): bool {.inline.}
 proc start*(sw: var Stopwatch) {.inline.}
 proc stop*(sw: var Stopwatch) {.inline.}
 proc reset*(sw: var Stopwatch) {.inline.}
 proc restart*(sw: var Stopwatch) {.inline.}
 
-
-# TODO lap functions
-# numLaps() -> count of laps      (flag to include current, if there is one)
-# lap(int, bool) -> single laps   (flag to include current, if there is one)
-# laps(bool) -> all laps          (flag to include current, if there is one)
-# rmLap(int) -> remove a lap by index, doesn't modify current lap
-# clearLaps() -> remove all laps, doesn't modify current lap
-
+# Lap functions
+proc numLaps*(sw: var Stopwatch; incCur: bool = false): int {.inline.}
+proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 {.inline.}
+proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] {.inline.}
+proc rmLap*(sw: var Stopwatch; num: int) {.inline.}
+proc clearLaps(sw: var Stopwatch) {.inline.}
 
 
 # These functions are for the current lap (or previous one if not running)
+# TODO do we even need those to be methods on the stopwatch? maybe because they are nice convienence methods
 #  TODO fix them up
 proc nsecs*(sw: var Stopwatch): int64 {.inline.}
 #proc usecs*(sw: var Stopwatch): int64 {.inline.}
@@ -52,7 +57,12 @@ proc newStopwatch*(): Stopwatch =
   )
 
 
-# TODO clone/copy constructor
+proc clone*(sw: var Stopwatch): Stopwatch =
+  result = Stopwatch(
+    running: sw.running,
+    startTicks: sw.startTicks,
+    laps: sw.laps
+  )
 
 
 proc running*(sw: var Stopwatch): bool =
@@ -98,6 +108,39 @@ proc restart*(sw: var Stopwatch) =
   sw.start()
 
 
+proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
+  return sw.laps.len + (if incCur and sw.running: 1 else: 0)
+
+
+proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
+  if incCur and sw.running:
+    # Check if the index is good or not
+    if num < sw.laps.len:
+      # Return one of the previous laps
+      return sw.laps[num]
+    elif num == sw.laps.len:
+      # Return the current lap
+      return sw.nsecs
+    else:
+      # Out of bounds
+      raise newException(IndexError, "provided lap number isn't valid.")
+  else:
+    # only look at completed laps
+    return sw.laps[num]
+
+
+proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
+  return sw.laps
+
+
+proc rmLap*(sw: var Stopwatch; num: int) =
+  sw.laps.delete(num)
+
+
+proc clearLaps(sw: var Stopwatch) =
+  sw.laps.setLen(0)
+
+
 proc nsecs*(sw: var Stopwatch): int64 =
   let curTicks = getTicks().Nanos
 
@@ -118,7 +161,7 @@ proc nsecs*(sw: var Stopwatch): int64 =
 
 
 proc secs*(sw: var Stopwatch): float =
-  return sw.nsecs.float / 1_000_000_000.0
+  return secs(sw.nsecs)
 
 
 # These functions include the time for all laps (plus the current lap, if there is one)
@@ -134,7 +177,7 @@ proc totalNsecs*(sw: var Stopwatch): int64 =
 
 
 proc totalSecs*(sw: var Stopwatch): float =
-  return sw.totalNsecs.float / 1_000_000_000.0
+  return secs(sw.totalNsecs)
 
 
 {.deprecated: [clock: Stopwatch].}
