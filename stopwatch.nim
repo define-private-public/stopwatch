@@ -31,10 +31,7 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] {.inline.}
 proc rmLap*(sw: var Stopwatch; num: int) {.inline.}
 proc clearLaps(sw: var Stopwatch) {.inline.}
 
-
 # These functions are for the current lap (or previous one if not running)
-# TODO do we even need those to be methods on the stopwatch? maybe because they are nice convienence methods
-#  TODO fix them up
 proc nsecs*(sw: var Stopwatch): int64 {.inline.}
 proc usecs*(sw: var Stopwatch): int64 {.inline.}
 proc msecs*(sw: var Stopwatch): int64 {.inline.}
@@ -51,7 +48,6 @@ proc totalSecs*(sw: var Stopwatch): float {.inline.}
 {.deprecated: [clock: Stopwatch].}
 {.deprecated: [nanoseconds: nsecs].}
 {.deprecated: [seconds: secs].}
-
 
 
 # TODO document
