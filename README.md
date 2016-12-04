@@ -72,16 +72,16 @@ var sw = newStopwatch()
 for y in countup(0, imgHeight - 1):
   for x in countup(0, imgWidth -1 ):
     sw.start()
-    # ... lengthy image operation
+    # ... lengthy pixel operation
     sw.stop()
 
 # Query an individual lap's time
 let firstPixelTime = sw.lap(0).msecs    # Gets time in milliseconds
 
-# Total time (all laps) in nanoseconds
-let nanos = sw.totalNsecs
+# Total time (all laps) in microseconds
+let nanos = sw.totalUsecs
 
-# Get each pixel's time in seconds (as a seq[float])
+# Get each lap's time into seconds from nanoseconds (as a seq[float])
 let lapsSecs = sw.laps.map(proc(x: int64): float = secs(x))
 ```
 
