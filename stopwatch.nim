@@ -1,3 +1,10 @@
+# File:         stopwatch.nim
+# Authors:      Benjamin N. Summerton <define-private-public>
+#               rbmz
+# License:      MIT; See the file `LICENSE` for details.
+# Description:  A handly Stopwatch for timing code execution and other things.
+
+
 include system/timers
 from sequtils import foldl
 
@@ -8,13 +15,12 @@ proc msecs*(nsecs: int64): int64 {.inline.}
 proc secs*(nsecs: int64): float {.inline.}
 
 
-# The stopwatch object
+# The Stopwatch object
 type
   Stopwatch* = object
     running: bool
     startTicks: Nanos 
     laps: seq[Nanos]
-
 
 # Basic stopwatch functionality
 proc newStopwatch*(): Stopwatch
@@ -45,7 +51,7 @@ proc totalMsecs*(sw: var Stopwatch): int64 {.inline.}
 proc totalSecs*(sw: var Stopwatch): float {.inline.}
 
 
-# Deprecations from the older stopwatch module
+# Deprecations from the older Stopwatch module
 {.deprecated: [clock: Stopwatch].}
 {.deprecated: [nanoseconds: nsecs].}
 {.deprecated: [seconds: secs].}

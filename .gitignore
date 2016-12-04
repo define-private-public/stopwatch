@@ -1,9 +1,4 @@
-*
-!*.txt
-!*.md
-!*.nim
-!.gitignore
-!stopwatch.nimble
-
 *.sw*
 nimcache/
+tester
+

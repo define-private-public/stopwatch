@@ -1,4 +1,19 @@
-# Stopwatch
+Stopwatch
+=========
+This is a fork of rbmz's stopwatch: https://github.com/rbmz/stopwatch
+It adds features such as multiple starting & stopping, lapping, and handy time
+measurement conversino utility functions.
+
+It is based off of Nim's builting `system/timers` module
+
+
+Documentation
+-------------
+All of the functions should be documented in the file `stopwatch.nim`.  At the
+top of the file are 
+
+
+
 
 ```nim
 
