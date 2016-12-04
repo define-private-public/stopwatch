@@ -177,6 +177,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
     # only look at completed laps
     return sw.laps[num]
 
+
 ## Returns a list of all the recorded laps (in nanoseconds).  If `incCur` is set
 ## `true`, then it will include the current lap in the result.  By default it is
 ## `false`.  If no lap is being recored, than `incCur` will be ignored.
@@ -202,6 +203,7 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
     allLaps.add(curLap)
 
   return allLaps
+
 
 ## Removes a lap from the Stopwatch's record with the given index of `num`.
 ## This function has the possibility of raising an `IndexError`.  
@@ -232,6 +234,7 @@ proc nsecs*(sw: var Stopwatch): int64 =
   else:
     # No laps yet
     return 0
+
 
 ## The same as `nsecs()`, except the return value is in microseconds.
 ##
