@@ -60,7 +60,7 @@ let totalSeconds = sw.secs  # Gets the time of the previous lap in this case
 ```
 
 
-Using laps, record only record the code you want to time:
+Using laps, record only the code you want to time:
 
 ```
 import stopwatch
