@@ -1,10 +1,12 @@
 import stopwatch
 from os import sleep
+from sequtils import map
+
 
 var sw = newStopwatch()
 
-echo "total=", sw.totalSecs
 
+echo "total=", sw.totalSecs
 sw.start()
 sleep(1000)
 echo "total=", sw.totalSecs
@@ -53,7 +55,7 @@ echo "all laps=", sw.laps
 echo "lapCount=", sw.numLaps
 echo "----"
 echo "lapCount=", sw2.numLaps
-echo "all laps=", sw2.laps
+echo "all laps(s)=", map(sw2.laps, secs)
 echo ""
 
 sw.reset()
@@ -64,5 +66,9 @@ echo "total=", sw.totalSecs
 sw.restart()
 echo "total=", sw.totalSecs
 sleep(250)
-echo "total=", sw.totalSecs
+echo "total(s)=", sw.totalSecs
+echo "total(m)=", sw.totalMsecs
+echo "total(u)=", sw.totalUsecs
+echo "total(n)=", sw.totalNsecs
 echo ""
+

@@ -2,10 +2,10 @@ include system/timers
 from sequtils import foldl
 
 
-# TODO find a better place for this
-# TODO ones for usecs and msecs
-proc secs*(nsecs: int64): float {.inline.} =
-  return nsecs.float / 1_000_000_000.0
+# Handy conversion functions
+proc usecs*(nsecs: int64): int64 {.inline.}
+proc msecs*(nsecs: int64): int64 {.inline.}
+proc secs*(nsecs: int64): float {.inline.}
 
 
 type
@@ -36,15 +36,21 @@ proc clearLaps(sw: var Stopwatch) {.inline.}
 # TODO do we even need those to be methods on the stopwatch? maybe because they are nice convienence methods
 #  TODO fix them up
 proc nsecs*(sw: var Stopwatch): int64 {.inline.}
-#proc usecs*(sw: var Stopwatch): int64 {.inline.}
-#proc msecs*(sw var Stopwatch): int64 {.inline.}
+proc usecs*(sw: var Stopwatch): int64 {.inline.}
+proc msecs*(sw: var Stopwatch): int64 {.inline.}
 proc secs*(sw: var Stopwatch): float {.inline.}
 
 # These functions include the time for all laps (plus the current lap, if there is one)
 proc totalNsecs*(sw: var Stopwatch): int64 {.inline.}
-#proc totalUsecs*(sw: var Stopwatch): int64 {.inline.}
-#proc totalMsecs*(sw var Stopwatch): int64 {.inline.}
+proc totalUsecs*(sw: var Stopwatch): int64 {.inline.}
+proc totalMsecs*(sw: var Stopwatch): int64 {.inline.}
 proc totalSecs*(sw: var Stopwatch): float {.inline.}
+
+
+# Deprecations from the older stopwatch module
+{.deprecated: [clock: Stopwatch].}
+{.deprecated: [nanoseconds: nsecs].}
+{.deprecated: [seconds: secs].}
 
 
 
@@ -152,12 +158,12 @@ proc nsecs*(sw: var Stopwatch): int64 =
     return sw.laps[high(sw.laps)].int64
 
 
-#proc usecs*(sw: var Stopwatch): int64 =
-#  return sw.nsecs / 1_000.int64
-#
-#
-#proc msecs*(sw var Stopwatch): int64 =
-#  return sw.nsecs / 1_000_000.int64
+proc usecs*(sw: var Stopwatch): int64 =
+  return usecs(sw.nsecs)
+
+
+proc msecs*(sw: var Stopwatch): int64 =
+  return msecs(sw.nsecs)
 
 
 proc secs*(sw: var Stopwatch): float =
@@ -176,17 +182,34 @@ proc totalNsecs*(sw: var Stopwatch): int64 =
     return total.int64
 
 
+proc totalUsecs*(sw: var Stopwatch): int64 =
+  return usecs(sw.totalNsecs)
+
+
+proc totalMsecs*(sw: var Stopwatch): int64 =
+  return msecs(sw.totalNsecs)
+
+
 proc totalSecs*(sw: var Stopwatch): float =
   return secs(sw.totalNsecs)
 
 
-{.deprecated: [clock: Stopwatch].}
-{.deprecated: [nanoseconds: nsecs].}
-{.deprecated: [seconds: secs].}
+
+
+proc usecs*(nsecs: int64): int64 =
+  return (nsecs div 1_000).int64
+
+
+proc msecs*(nsecs: int64): int64 =
+  return (nsecs div 1_000_000).int64
+
+
+proc secs*(nsecs: int64): float =
+  return nsecs.float / 1_000_000_000.0
+
 
 
 #template bench*(sw: Stopwatch, body: stmt): stmt {.immediate.} =
 #  sw.start()
 #  body
 #  sw.stop()
-
