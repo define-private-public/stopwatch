@@ -4,10 +4,11 @@ from sequtils import map
 
 
 var sw = newStopwatch()
-
+echo "laps=", sw.laps(true)
 
 echo "total=", sw.totalSecs
 sw.start()
+echo "laps=", sw.laps(true)
 sleep(1000)
 echo "total=", sw.totalSecs
 sw.stop()

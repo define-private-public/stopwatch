@@ -179,7 +179,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 
 ## Returns a list of all the recorded laps (in nanoseconds).  If `incCur` is set
 ## `true`, then it will include the current lap in the result.  By default it is
-## `false`.
+## `false`.  If no lap is being recored, than `incCur` will be ignored.
 ##
 ## If you want to convert the returned value to a different time measurement,
 ## use one of the functions: `msecs()`, `usecs()` or `secs()` in conjunction
@@ -194,9 +194,14 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 ##   echo lapsSecs
 ##   # --> @[1.000117, 0.500115, 0.200212]
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
-  # TODO need to include the current lap too!
-  return sw.laps
+  var
+    curLap = sw.nsecs
+    allLaps = sw.laps
 
+  if sw.running and incCur:
+    allLaps.add(curLap)
+
+  return allLaps
 
 ## Removes a lap from the Stopwatch's record with the given index of `num`.
 ## This function has the possibility of raising an `IndexError`.  
