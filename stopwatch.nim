@@ -203,9 +203,3 @@ proc msecs*(nsecs: int64): int64 =
 proc secs*(nsecs: int64): float =
   return nsecs.float / 1_000_000_000.0
 
-
-
-#template bench*(sw: Stopwatch, body: stmt): stmt {.immediate.} =
-#  sw.start()
-#  body
-#  sw.stop()
