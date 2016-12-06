@@ -269,7 +269,7 @@ proc secs*(sw: var Stopwatch): float =
 ## See also: `totalUsecs()`, `totalMsecs()`, `totalSecs()`
 proc totalNsecs*(sw: var Stopwatch): int64 =
   let curTicks = getTicks().Nanos
-  let total = if sw.laps.len != 0: foldl(sw.laps, a + b) else: 0
+  let total = foldl(sw.laps, a + b, 0.int64)
 
   if sw.running:
     # Return total + current lap
