@@ -6,6 +6,11 @@ measurement conversion utility functions.
 
 It is based off of Nim's builting `system/timers` module
 
+The offical repo can be found here:
+https://gitlab.com/define-private-public/stopwatch
+
+All other places should be considered mirrors.
+
 
 Documentation
 -------------
