@@ -84,7 +84,7 @@ for y in countup(0, imgHeight - 1):
 let firstPixelTime = sw.lap(0).msecs    # Gets time in milliseconds
 
 # Total time (all laps) in microseconds
-let nanos = sw.totalUsecs
+let micros = sw.totalUsecs
 
 # Get each lap's time into seconds from nanoseconds (as a seq[float])
 let lapsSecs = sw.laps.map(proc(x: int64): float = secs(x))
