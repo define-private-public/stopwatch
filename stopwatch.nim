@@ -23,7 +23,7 @@ type
     laps: seq[Nanos]
 
 # Basic stopwatch functionality
-proc newStopwatch*(): Stopwatch
+proc stopwatch*(): Stopwatch
 proc clone*(sw: var Stopwatch): Stopwatch
 proc running*(sw: var Stopwatch): bool {.inline.}
 proc start*(sw: var Stopwatch) {.inline.}
@@ -56,6 +56,8 @@ proc totalSecs*(sw: var Stopwatch): float {.inline.}
 {.deprecated: [nanoseconds: nsecs].}
 {.deprecated: [seconds: secs].}
 
+# Deprecation for v1.0 -> v1.1
+{.deprecated: [newStopwatch: stopwatch].}
 
 
 
@@ -85,7 +87,7 @@ proc secs*(nsecs: int64): float =
 #=====================#
 
 ## Creates a new Stopwatch.  It has no laps and isn't running
-proc newStopwatch*(): Stopwatch =
+proc stopwatch*(): Stopwatch =
   result = Stopwatch(
     running: false,
     startTicks: 0,
@@ -193,7 +195,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 ## with the `map()` function from the `sequtils` module.  Example:
 ##
 ## .. code-block:: nim
-##   var sw = newStopwatch()
+##   var sw = stopwatch()
 ##
 ##   # some time measurements later...
 ##

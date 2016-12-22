@@ -56,7 +56,7 @@ Simple usage:
 ```nim
 import stopwatch
 
-var sw = newStopwatch()
+var sw = stopwatch()
 sw.start()
 # ... Long computation time
 sw.stop()
@@ -71,7 +71,7 @@ Using laps, record only the code you want to time:
 import stopwatch
 from sequtils import map
 
-var sw = newStopwatch()
+var sw = stopwatch()
 
 # We're operating on a large image...
 for y in countup(0, imgHeight - 1):

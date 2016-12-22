@@ -3,7 +3,7 @@ from os import sleep
 from sequtils import map
 
 
-var sw = newStopwatch()
+var sw = stopwatch()
 echo "laps=", sw.laps(true)
 
 echo "total=", sw.totalSecs
