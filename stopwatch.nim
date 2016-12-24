@@ -225,7 +225,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): float =
 ##   # --> @[1000.117, 500.115, 200.212]
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[float] =
   var
-    curLap = sw.nsecs
+    curLap = sw.secs
     allLaps = sw.laps
 
   if sw.running and incCur:
