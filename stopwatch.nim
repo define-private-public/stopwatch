@@ -6,7 +6,6 @@
 
 
 include system/timers
-from sequtils import foldl
 
 
 # Handy conversion functions
@@ -21,6 +20,7 @@ type
     running: bool
     startTicks: Nanos 
     laps: seq[Nanos]
+    total: Nanos
 
 # Basic stopwatch functionality
 proc stopwatch*(): Stopwatch
@@ -106,7 +106,8 @@ proc stopwatch*(): Stopwatch =
   result = Stopwatch(
     running: false,
     startTicks: 0,
-    laps: @[]
+    laps: @[],
+    total: 0
   )
 
 
@@ -116,7 +117,8 @@ proc clone*(sw: var Stopwatch): Stopwatch =
   result = Stopwatch(
     running: sw.running,
     startTicks: sw.startTicks,
-    laps: sw.laps
+    laps: sw.laps,
+    total: sw.total
   )
 
 
@@ -147,8 +149,10 @@ proc stop*(sw: var Stopwatch) =
   if not sw.running:
     return
 
-  # save the lap that we just made
-  sw.laps.add(stopTicks - sw.startTicks)
+  # save the lap that we just made (and add it to the accum)
+  let lapTime = stopTicks - sw.startTicks
+  sw.laps.add(lapTime)
+  sw.total += lapTime
 
   # Reset timer state
   sw.running = false
@@ -161,6 +165,7 @@ proc reset*(sw: var Stopwatch) =
   sw.running = false
   sw.startTicks = 0
   sw.laps.setLen(0)   # Clear the laps
+  sw.total = 0        # Zero the accum
 
 
 ## This function will clear out the state of the Stopwatch and tell it to start
@@ -231,6 +236,10 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
 ## Removes a lap from the Stopwatch's record with the given index of `num`.
 ## This function has the possibility of raising an `IndexError`.  
 proc rmLap*(sw: var Stopwatch; num: int) =
+  # Remove its time from the accum
+  let t = sw.laps[num]
+  sw.total -= t
+
   sw.laps.delete(num)
 
 
@@ -238,6 +247,7 @@ proc rmLap*(sw: var Stopwatch; num: int) =
 ## effect the current lap (if one is being measured).
 proc clearLaps(sw: var Stopwatch) =
   sw.laps.setLen(0)
+  sw.total = 0
 
 
 ## This will return either the length of the current lap (if `stop()` has not
@@ -286,13 +296,12 @@ proc secs*(sw: var Stopwatch): float =
 ## See also: `totalUsecs()`, `totalMsecs()`, `totalSecs()`
 proc totalNsecs*(sw: var Stopwatch): int64 =
   let curTicks = getTicks().Nanos
-  let total = foldl(sw.laps, a + b, 0.int64)
 
   if sw.running:
     # Return total + current lap
-    return (total + (curTicks - sw.startTicks)).int64
+    return (sw.total + (curTicks - sw.startTicks)).int64
   else:
-    return total.int64
+    return sw.total.int64
 
 
 ## The same as `totalNsecs()`, except the return value is in microseconds.
