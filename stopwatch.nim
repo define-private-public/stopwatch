@@ -183,13 +183,13 @@ proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
   return sw.laps.len + (if incCur and sw.running: 1 else: 0)
 
 
-## Returns the time (in nanoseconds) of a lap with the provided index of `num`.
+## Returns the time (in seconds) of a lap with the provided index of `num`.
 ## If `incCur` is set to `true`, it will include the current lap in the range
 ## (as the last lap).  By default it is set to `false`.  This function can raise
 ## an `IndexError` if `num` isn't a valid lap index.
 ##
 ## If you want to convert the returned value to a different time measurement,
-## use one of the functions: `msecs()`, `usecs()` or `secs()`.
+## use one of the functions: `msecs()`, `usecs()` or `nsecs()`.
 proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): float =
   if incCur and sw.running:
     # Check if the index is good or not
@@ -253,30 +253,9 @@ proc clearLaps(sw: var Stopwatch) =
 
 ## This will return either the length of the current lap (if `stop()` has not
 ## been called, or the time of the previously measured lap.  The return value is
-## in nanoseconds.  If no laps have been run yet, then this will return 0.
+## in seconds.  If no laps have been run yet, then this will return 0.
 ##
 ## See also: `usecs()`, `msecs()`, `secs()`
-proc nsecs*(sw: var Stopwatch): float =
-  return nsecs(sw.secs)
-
-
-## The same as `nsecs()`, except the return value is in microseconds.
-##
-## See also: `nsecs()`, `msecs()`, `secs()`
-proc usecs*(sw: var Stopwatch): float =
-  return usecs(sw.secs)
-
-
-## The same as `nsecs()`, except the return value is in milliseconds.
-##
-## See also: `nsecs()`, `usecs()`, `secs()`
-proc msecs*(sw: var Stopwatch): float =
-  return msecs(sw.secs)
-
-
-## The same as `nsecs()`, except the return value is in seconds
-##
-## See also: `nsecs()`, `usecs()`, `msecs()`
 proc secs*(sw: var Stopwatch): float =
   let curTicks = epochTime()
 
@@ -291,32 +270,31 @@ proc secs*(sw: var Stopwatch): float =
     return 0
 
 
+## The same as `secs()`, except the return value is in milliseconds.
+##
+## See also: `secs()`, `usecs()`, `nsecs()`
+proc msecs*(sw: var Stopwatch): float =
+  return msecs(sw.secs)
+
+
+## The same as `secs()`, except the return value is in microseconds.
+##
+## See also: `ssecs()`, `msecs()`, `nsecs()`
+proc usecs*(sw: var Stopwatch): float =
+  return usecs(sw.secs)
+
+
+## The same as `secs()`, except the return value is in nanoseconds
+##
+## See also: `ssecs()`, `usecs()`, `msecs()`
+proc nsecs*(sw: var Stopwatch): float =
+  return nsecs(sw.secs)
+
+
 ## This returns the time of all laps combined, plus the current lap (if
-## Stopwatch is running).  The return value is in nanoseconds.
+## Stopwatch is running).  The return value is in seconds.
 ##
 ## See also: `totalUsecs()`, `totalMsecs()`, `totalSecs()`
-proc totalNsecs*(sw: var Stopwatch): float =
-  return nsecs(sw.totalSecs)
-
-
-## The same as `totalNsecs()`, except the return value is in microseconds.
-##
-## See also: `totalNsecs()`, `totalMsecs()`, `totalSecs()`
-proc totalUsecs*(sw: var Stopwatch): float =
-  return usecs(sw.totalSecs)
-
-
-## The same as `totalNsecs()`, except the return value is in milliseconds.
-##
-## See also: `totalNsecs()`, `totalUsecs()`,`totalSecs()`
-proc totalMsecs*(sw: var Stopwatch): float =
-  return msecs(sw.totalSecs)
-
-
-## The same as `totalNsecs()`, except the return value is in seconds (as a
-## float).
-##
-## See also: `totalNsecs()`, `totalUsecs()`, `totalMsecs()`
 proc totalSecs*(sw: var Stopwatch): float =
   let curTicks = epochTime()
 
@@ -325,4 +303,25 @@ proc totalSecs*(sw: var Stopwatch): float =
     return (sw.total + (curTicks - sw.startTicks))
   else:
     return sw.total
+
+
+## The same as `totalSecs()`, except the return value is in milliseconds.
+##
+## See also: `totalSecs()`, `totalUsecs()`,`totalNSecs()`
+proc totalMsecs*(sw: var Stopwatch): float =
+  return msecs(sw.totalSecs)
+
+
+## The same as `totalSecs()`, except the return value is in microseconds.
+##
+## See also: `totalSecs()`, `totalMsecs()`, `totalNSecs()`
+proc totalUsecs*(sw: var Stopwatch): float =
+  return usecs(sw.totalSecs)
+
+
+## The same as `totalSecs()`, except the return value is in nanoseconds
+##
+## See also: `totalSecs()`, `totalUsecs()`, `totalMsecs()`
+proc totalNsecs*(sw: var Stopwatch): float =
+  return nsecs(sw.totalSecs)
 

@@ -4,7 +4,7 @@ This is a fork of rbmz's stopwatch: https://github.com/rbmz/stopwatch
 It adds features such as multiple starting & stopping, lapping, and handy time
 measurement conversion utility functions.
 
-It is based off of Nim's builting `system/timers` module
+It is based off of Nim's `epochTime()` proc from the `times` module.
 
 The offical repo can be found here:
 https://gitlab.com/define-private-public/stopwatch
@@ -81,7 +81,7 @@ let firstPixelTime = sw.lap(0).msecs    # Gets time in milliseconds
 # Total time (all laps) in microseconds
 let micros = sw.totalUsecs
 
-# Get each lap's time into seconds from nanoseconds (as a seq[float])
-let lapsSecs = sw.laps.map(proc(x: int64): float = secs(x))
+# Get each lap's time into nanoseconds from seconds (as a seq[float])
+let lapsNsecs = sw.laps.map(proc(x: float): float = nsecs(x))
 ```
 
