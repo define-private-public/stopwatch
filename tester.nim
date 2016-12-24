@@ -49,17 +49,17 @@ echo ""
 var sw2 = sw.clone()
 
 echo "lapCount=", sw.numLaps
-echo "L1=", sw.lap(0).secs
-echo "L2=", sw.laps[1].secs
+echo "L1=", sw.lap(0)
+echo "L2=", sw.laps[1]
 sw.rmLap(0)
 echo "all laps=", sw.laps
 echo "lapCount=", sw.numLaps
 echo "----"
 echo "lapCount=", sw2.numLaps
 
-var lapsSecs = sw2.laps.map(proc(x: int64): float = secs(x))
+var lapsMsecs = sw2.laps.map(proc(x: float): float = msecs(x))
 
-echo "all laps(s)=", lapsSecs
+echo "all laps(s)=", lapsMsecs
 echo ""
 
 sw.reset()
