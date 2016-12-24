@@ -76,3 +76,6 @@ echo "total(u)=", sw.totalUsecs
 echo "total(n)=", sw.totalNsecs
 echo ""
 
+bench(sw, sleep(1000))
+echo "bench(sleep(1000))=", sw.secs
+

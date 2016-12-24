@@ -1,8 +1,8 @@
 [Package]
 name          = "stopwatch"
-version       = "1.1"
+version       = "1.2"
 author        = "define-private-public"
-description   = "A fork of \"stopwatch\" that adds more features"
+description   = "A simple timing object for benchmarking code and other things."
 license       = "MIT"
 
 [Deps]

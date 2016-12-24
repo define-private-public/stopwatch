@@ -32,7 +32,6 @@ There exist more functions than what is described here.  Read the documentation
 in `stopwatch.nim` to find out.  Some samples are at the end of this document.
 
 
-
 Breaking Changes
 ----------------
 Here is what has changed names:
@@ -42,10 +41,6 @@ Here is what has changed names:
  - `seconds` -> `secs`
 
 All of the fields in `Stopwatch` have been marked invisible.
-
-The `bench` template has also been removed for the time being.  If there are
-some requests to add it back in, I'll do so.
-
 
 
 Examples

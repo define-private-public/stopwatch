@@ -61,6 +61,21 @@ proc totalSecs*(sw: var Stopwatch): float {.inline.}
 
 
 
+#===============#
+#== Templates ==#
+#===============#
+
+## A simple template that will wrap the `start()` and `stop()` calls around
+## a block of code.  Make sure that the passed in Stopwatch has been
+## initialized.  If the Stopwatch is already running, it will stop it it first.
+template bench*(sw: Stopwatch; body: untyped): untyped =
+  sw.stop()
+  sw.start()
+  body
+  sw.stop()
+
+
+
 #===============================#
 #== Time Conversion Functions ==#
 #===============================#
