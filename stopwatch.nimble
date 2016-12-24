@@ -2,7 +2,7 @@
 name          = "stopwatch"
 version       = "1.2"
 author        = "define-private-public"
-description   = "A simple timing object for benchmarking code and other things."
+description   = "A simple timing library for benchmarking code and other things."
 license       = "MIT"
 
 [Deps]
