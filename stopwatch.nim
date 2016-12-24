@@ -9,8 +9,8 @@ from times import epochTime
 
 
 # Handy conversion functions
-proc usecs*(secs: float): float {.inline.}
 proc msecs*(secs: float): float {.inline.}
+proc usecs*(secs: float): float {.inline.}
 proc nsecs*(secs: float): float {.inline.}
 
 
@@ -39,16 +39,16 @@ proc rmLap*(sw: var Stopwatch; num: int) {.inline.}
 proc clearLaps(sw: var Stopwatch) {.inline.}
 
 # Getting the time of the current lap (or previously ran one, if the stopwatch is stopped)
-proc nsecs*(sw: var Stopwatch): float {.inline.}
-proc usecs*(sw: var Stopwatch): float {.inline.}
-proc msecs*(sw: var Stopwatch): float {.inline.}
 proc secs*(sw: var Stopwatch): float {.inline.}
+proc msecs*(sw: var Stopwatch): float {.inline.}
+proc usecs*(sw: var Stopwatch): float {.inline.}
+proc nsecs*(sw: var Stopwatch): float {.inline.}
 
 # These functions include the time for all laps (plus the current lap, if there is one)
-proc totalNsecs*(sw: var Stopwatch): float {.inline.}
-proc totalUsecs*(sw: var Stopwatch): float {.inline.}
-proc totalMsecs*(sw: var Stopwatch): float {.inline.}
 proc totalSecs*(sw: var Stopwatch): float {.inline.}
+proc totalMsecs*(sw: var Stopwatch): float {.inline.}
+proc totalUsecs*(sw: var Stopwatch): float {.inline.}
+proc totalNsecs*(sw: var Stopwatch): float {.inline.}
 
 
 # Deprecations from the older Stopwatch module
@@ -80,13 +80,14 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
 #== Time Conversion Functions ==#
 #===============================#
 
+
 ## Converts seconds to microseconds
-proc usecs*(secs: float): float =
+proc msecs*(secs: float): float =
   return secs * 1_000
 
 
 ## Converts seconds to microseconds
-proc msecs*(secs: float): float =
+proc usecs*(secs: float): float =
   return secs * 1_000_000
 
 
