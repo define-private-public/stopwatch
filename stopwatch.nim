@@ -19,7 +19,7 @@ type
   Stopwatch* = object
     running: bool
     startTicks: Ticks
-    laps: seq[Nanos]
+    laps: seq[Ticks]
     total: Nanos 
 
 # Basic stopwatch functionality
@@ -151,7 +151,7 @@ proc stop*(sw: var Stopwatch) =
 
   # save the lap that we just made (and add it to the accum)
   let lapTime = stopTicks - sw.startTicks
-  sw.laps.add(lapTime)
+  sw.laps.add(lapTime.Ticks)
   sw.total += lapTime
 
   # Reset timer state
@@ -194,7 +194,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
     # Check if the index is good or not
     if num < sw.laps.len:
       # Return one of the previous laps
-      return sw.laps[num]
+      return sw.laps[num].int64
     elif num == sw.laps.len:
       # Return the current lap
       return sw.nsecs
@@ -203,7 +203,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
       raise newException(IndexError, "provided lap number isn't valid.")
   else:
     # only look at completed laps
-    return sw.laps[num]
+    return sw.laps[num].int64
 
 
 ## Returns a list of all the recorded laps (in nanoseconds).  If `incCur` is set
@@ -225,7 +225,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
   var
     curLap = sw.nsecs
-    allLaps = sw.laps
+    allLaps = cast[seq[int64]](sw.laps)
 
   if sw.running and incCur:
     allLaps.add(curLap)
@@ -237,7 +237,7 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
 ## This function has the possibility of raising an `IndexError`.  
 proc rmLap*(sw: var Stopwatch; num: int) =
   # Remove its time from the accum
-  let t = sw.laps[num]
+  let t = sw.laps[num].Nanos
   sw.total -= t
 
   sw.laps.delete(num)
