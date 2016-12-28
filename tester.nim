@@ -59,7 +59,7 @@ echo "lapCount=", sw2.numLaps
 
 var lapsMsecs = sw2.laps.map(proc(x: float): float = msecs(x))
 
-echo "all laps(s)=", lapsMsecs
+echo "all laps(ms)=", lapsMsecs
 echo ""
 
 sw.reset()
