@@ -8,6 +8,17 @@
 include system/timers
 
 
+# Because of issues with portability on Linux, Windows, and OS X, the Apple OS
+# needs to use `epochTime()` to get the current time (which is less precise)
+# instead of getTicks().  This proc is for internal use only
+proc getNanos(): Nanos {.inline.} = 
+  when defined(macosx):
+    from times import epochTime()
+    return (epochTime() * 1_000_000_000).Nanos
+  else:
+    return getTicks().Nanos
+
+
 # Handy conversion functions
 proc usecs*(nsecs: int64): int64 {.inline.}
 proc msecs*(nsecs: int64): int64 {.inline.}
@@ -136,14 +147,14 @@ proc start*(sw: var Stopwatch) =
 
   # Start the lap
   sw.running = true
-  sw.startTicks = getTicks().Nanos
+  sw.startTicks = getNanos()
 
 
 ## Makes the Stopwatch stop measuring time.  It will record the lap it has
 ## taken.  If the Stopwatch wasn't running before, nothing will happen
 proc stop*(sw: var Stopwatch) =
   # First thing, measure the time
-  let stopTicks = getTicks().Nanos
+  let stopTicks = getNanos()
 
   # If not running, ignore
   if not sw.running:
@@ -256,7 +267,7 @@ proc clearLaps(sw: var Stopwatch) =
 ##
 ## See also: `usecs()`, `msecs()`, `secs()`
 proc nsecs*(sw: var Stopwatch): int64 =
-  let curTicks = getTicks().Nanos
+  let curTicks = getNanos()
 
   if sw.running:
     # Return current lap
@@ -295,7 +306,7 @@ proc secs*(sw: var Stopwatch): float =
 ##
 ## See also: `totalUsecs()`, `totalMsecs()`, `totalSecs()`
 proc totalNsecs*(sw: var Stopwatch): int64 =
-  let curTicks = getTicks().Nanos
+  let curTicks = getNanos()
 
   if sw.running:
     # Return total + current lap
