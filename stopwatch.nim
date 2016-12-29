@@ -11,12 +11,7 @@ include system/timers
 # Because of issues with portability on Linux, Windows, and OS X, the Apple OS
 # needs to use `epochTime()` to get the current time (which is less precise)
 # instead of getTicks().  This proc is for internal use only
-proc getNanos(): Nanos {.inline.} = 
-  when defined(macosx):
-    from times import epochTime()
-    return (epochTime() * 1_000_000_000).Nanos
-  else:
-    return getTicks().Nanos
+proc getNanos(): Nanos {.inline.}
 
 
 # Handy conversion functions
@@ -85,6 +80,22 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
   body
   sw.stop()
 
+
+#====================#
+#== Internal Procs ==#
+#====================#
+
+
+when defined(macosx):
+  # For OS X
+  from times import epochTime
+
+  proc getNanos(): Nanos = 
+    return (epochTime() * 1_000_000_000).Nanos
+else:
+  # For Linux & Windows
+  proc getNanos(): Nanos = 
+    return getTicks().Nanos
 
 
 #===============================#
