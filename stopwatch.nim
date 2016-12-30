@@ -11,7 +11,7 @@ include system/timers
 # Because of issues with portability on Linux, Windows, and OS X, the Apple OS
 # needs to use `epochTime()` to get the current time (which is less precise)
 # instead of getTicks().  This proc is for internal use only
-proc getNanos(): Nanos {.inline.}
+proc getTicks_internal(): Ticks {.inline.}
 
 
 # Handy conversion functions
@@ -24,8 +24,8 @@ proc secs*(nsecs: int64): float {.inline.}
 type
   Stopwatch* = object
     running: bool
-    startTicks: Nanos 
-    laps: seq[Nanos]
+    startTicks: Ticks 
+    laps: seq[Ticks]
     total: Nanos
 
 # Basic stopwatch functionality
@@ -90,12 +90,12 @@ when defined(macosx):
   # For OS X
   from times import epochTime
 
-  proc getNanos(): Nanos = 
-    return (epochTime() * 1_000_000_000).Nanos
+  proc getTicks_internal(): Ticks= 
+    return (epochTime() * 1_000_000_000).Ticks
 else:
   # For Linux & Windows
-  proc getNanos(): Nanos = 
-    return getTicks().Nanos
+  proc getTicks_internal(): Ticks= 
+    return getTicks()
 
 
 #===============================#
@@ -127,7 +127,7 @@ proc secs*(nsecs: int64): float =
 proc stopwatch*(): Stopwatch =
   result = Stopwatch(
     running: false,
-    startTicks: 0,
+    startTicks: 0.Ticks,
     laps: @[],
     total: 0
   )
@@ -158,14 +158,14 @@ proc start*(sw: var Stopwatch) =
 
   # Start the lap
   sw.running = true
-  sw.startTicks = getNanos()
+  sw.startTicks = getTicks_internal()
 
 
 ## Makes the Stopwatch stop measuring time.  It will record the lap it has
 ## taken.  If the Stopwatch wasn't running before, nothing will happen
 proc stop*(sw: var Stopwatch) =
   # First thing, measure the time
-  let stopTicks = getNanos()
+  let stopTicks = getTicks_internal()
 
   # If not running, ignore
   if not sw.running:
@@ -173,19 +173,19 @@ proc stop*(sw: var Stopwatch) =
 
   # save the lap that we just made (and add it to the accum)
   let lapTime = stopTicks - sw.startTicks
-  sw.laps.add(lapTime)
+  sw.laps.add(lapTime.Ticks)
   sw.total += lapTime
 
   # Reset timer state
   sw.running = false
-  sw.startTicks = 0
+  sw.startTicks = 0.Ticks
 
 
 ## Clears out the state of the Stopwatch.  This deletes all of the lap data and
 ## will make it stop measuring time.
 proc reset*(sw: var Stopwatch) =
   sw.running = false
-  sw.startTicks = 0
+  sw.startTicks = 0.Ticks
   sw.laps.setLen(0)   # Clear the laps
   sw.total = 0        # Zero the accum
 
@@ -216,7 +216,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
     # Check if the index is good or not
     if num < sw.laps.len:
       # Return one of the previous laps
-      return sw.laps[num]
+      return sw.laps[num].int64
     elif num == sw.laps.len:
       # Return the current lap
       return sw.nsecs
@@ -225,7 +225,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
       raise newException(IndexError, "provided lap number isn't valid.")
   else:
     # only look at completed laps
-    return sw.laps[num]
+    return sw.laps[num].int64
 
 
 ## Returns a list of all the recorded laps (in nanoseconds).  If `incCur` is set
@@ -247,7 +247,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
   var
     curLap = sw.nsecs
-    allLaps = sw.laps
+    allLaps = cast[seq[int64]](sw.laps)
 
   if sw.running and incCur:
     allLaps.add(curLap)
@@ -260,7 +260,7 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
 proc rmLap*(sw: var Stopwatch; num: int) =
   # Remove its time from the accum
   let t = sw.laps[num]
-  sw.total -= t
+  sw.total = sw.total.Ticks - t
 
   sw.laps.delete(num)
 
@@ -278,7 +278,7 @@ proc clearLaps(sw: var Stopwatch) =
 ##
 ## See also: `usecs()`, `msecs()`, `secs()`
 proc nsecs*(sw: var Stopwatch): int64 =
-  let curTicks = getNanos()
+  let curTicks = getTicks_internal()
 
   if sw.running:
     # Return current lap
@@ -317,7 +317,7 @@ proc secs*(sw: var Stopwatch): float =
 ##
 ## See also: `totalUsecs()`, `totalMsecs()`, `totalSecs()`
 proc totalNsecs*(sw: var Stopwatch): int64 =
-  let curTicks = getNanos()
+  let curTicks = getTicks_internal()
 
   if sw.running:
     # Return total + current lap
