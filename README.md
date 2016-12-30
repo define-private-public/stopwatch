@@ -4,12 +4,11 @@ This is a fork of rbmz's stopwatch: https://github.com/rbmz/stopwatch
 It adds features such as multiple starting & stopping, lapping, and handy time
 measurement conversion utility functions.
 
-It is based off of Nim's builting `system/timers` module
-
 The offical repo can be found here:
 https://gitlab.com/define-private-public/stopwatch
 
-All other places should be considered mirrors.
+All other places should be considered mirrors, but I am willing to address
+issues on places like GitHub.  Please use the GitLab repo though if you can.
 
 
 Documentation
@@ -84,4 +83,14 @@ let micros = sw.totalUsecs
 # Get each lap's time into seconds from nanoseconds (as a seq[float])
 let lapsSecs = sw.laps.map(proc(x: int64): float = secs(x))
 ```
+
+
+Other Notes
+-----------
+
+While in development, rbmz and I noticed some issues with precision on non-Linux
+platforms.  The difference should be negligible for most of your use cases (e.g.
+measuring a download's time), but could be an issue if you're looking for
+precise nanosecond resolution an all three of the major platforms.  Contact me
+on the issue tracker if you have any ideas on how to improve this.
 
