@@ -74,7 +74,7 @@ echo "lapCount=", sw.numLaps
 echo "----"
 echo "lapCount=", sw2.numLaps
 
-var lapsSecs = if sw.isRecordingLaps: sw2.laps().map(proc(x: int64): float = secs(x)) else: @[]
+var lapsSecs = if sw.isRecordingLaps: sw2.laps().map(proc(x: int64): float = secs(x)) else: nil
 
 echo "all laps(s)=", lapsSecs
 echo ""

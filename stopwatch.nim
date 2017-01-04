@@ -26,6 +26,7 @@ type
     running: bool
     startTicks: Ticks
     recordLaps: bool
+    previousLap: Ticks
     laps: seq[Ticks]
     total: Nanos
 
@@ -133,6 +134,7 @@ proc stopwatch*(enableLapping:bool): Stopwatch =
     running: false,
     startTicks: 0.Ticks,
     recordLaps: enableLapping,
+    previousLap: 0.Ticks,
     laps: if enableLapping: @[] else: nil,
     total: 0
   )
@@ -145,6 +147,7 @@ proc clone*(sw: var Stopwatch): Stopwatch =
     running: sw.running,
     startTicks: sw.startTicks,
     recordLaps: sw.recordLaps,
+    previousLap: sw.previousLap,
     laps: sw.laps,
     total: sw.total
   )
@@ -183,6 +186,7 @@ proc stop*(sw: var Stopwatch) =
   # Save it to the laps
   if sw.isRecordingLaps:
     sw.laps.add(lapTime.Ticks)
+  sw.previousLap = lapTime.Ticks
 
   # Add it to the accum
   sw.total += lapTime
@@ -197,6 +201,7 @@ proc stop*(sw: var Stopwatch) =
 proc reset*(sw: var Stopwatch) =
   sw.running = false
   sw.startTicks = 0.Ticks
+  sw.previousLap = 0.Ticks
   sw.total = 0        # Zero the accum
 
   # Clear the laps
@@ -246,8 +251,8 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
   if incCur and sw.running:
     # Check if the index is good or not
     if num < sw.laps.len:
-      # Return one of the previous laps
-      return sw.laps[num].int64
+      # Return the previous lap
+      return sw.previousLap.int64
     elif num == sw.laps.len:
       # Return the current lap
       return sw.nsecs
@@ -320,6 +325,7 @@ proc clearLaps(sw: var Stopwatch) =
 
   sw.laps.setLen(0)
   sw.total = 0
+  sw.previousLap = 0.Ticks
 
 
 ## This will return either the length of the current lap (if `stop()` has not
@@ -337,10 +343,10 @@ proc nsecs*(sw: var Stopwatch): int64 =
     return (curTicks - sw.startTicks).int64
   elif not sw.isRecordingLaps:
     # Lapping is off
-    return sw.totalNsecs()
+    return sw.previousLap.int64
   elif sw.laps.len != 0:
     # Return previous lap
-    return sw.laps[high(sw.laps)].int64
+    return sw.previousLap.int64
   else:
     # No laps yet
     return 0
