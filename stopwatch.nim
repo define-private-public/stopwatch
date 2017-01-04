@@ -29,7 +29,7 @@ type
     total: Nanos
 
 # Basic stopwatch functionality
-proc stopwatch*(): Stopwatch
+proc stopwatch*(enableLapping:bool = true): Stopwatch
 proc clone*(sw: var Stopwatch): Stopwatch
 proc running*(sw: var Stopwatch): bool {.inline.}
 proc start*(sw: var Stopwatch) {.inline.}
@@ -123,12 +123,14 @@ proc secs*(nsecs: int64): float =
 #== Stopwatch procs ==#
 #=====================#
 
-## Creates a new Stopwatch.  It has no laps and isn't running
-proc stopwatch*(): Stopwatch =
+## Creates a new Stopwatch.  It has no laps and isn't running.  If you want to
+## turn of lapping then pass `false` to the `enableLapping` paramater.  By
+## default it is on.
+proc stopwatch*(enableLapping:bool): Stopwatch =
   result = Stopwatch(
     running: false,
     startTicks: 0.Ticks,
-    laps: @[],
+    laps: if enableLapping: @[] else: nil,
     total: 0
   )
 
@@ -171,9 +173,14 @@ proc stop*(sw: var Stopwatch) =
   if not sw.running:
     return
 
-  # save the lap that we just made (and add it to the accum)
+  # Get lap time
   let lapTime = stopTicks - sw.startTicks
-  sw.laps.add(lapTime.Ticks)
+
+  # Save it to the laps
+  if sw.laps.addr != nil:
+    sw.laps.add(lapTime.Ticks)
+
+  # Add it to the accum
   sw.total += lapTime
 
   # Reset timer state
@@ -181,13 +188,16 @@ proc stop*(sw: var Stopwatch) =
   sw.startTicks = 0.Ticks
 
 
-## Clears out the state of the Stopwatch.  This deletes all of the lap data and
-## will make it stop measuring time.
+## Clears out the state of the Stopwatch.  This deletes all of the lap data (if
+## lapping is enabled) and will stop the stopwatch.
 proc reset*(sw: var Stopwatch) =
   sw.running = false
   sw.startTicks = 0.Ticks
-  sw.laps.setLen(0)   # Clear the laps
   sw.total = 0        # Zero the accum
+
+  # Clear the laps
+  if sw.laps.addr != nil:
+    sw.laps.setLen(0)
 
 
 ## This function will clear out the state of the Stopwatch and tell it to start
@@ -200,8 +210,13 @@ proc restart*(sw: var Stopwatch) =
 ## Returns the number of laps the Stopwatch has recorded so far.  If `incCur` is
 ## set to `true`, it will include the current lap in the count.  By default it
 ## set to `false`.
+##
+## If lapping is not enabled, this will 0
 proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
-  return sw.laps.len + (if incCur and sw.running: 1 else: 0)
+  if sw.laps.addr != nil:
+    return sw.laps.len + (if incCur and sw.running: 1 else: 0)
+  else:
+    return 0
 
 
 ## Returns the time (in nanoseconds) of a lap with the provided index of `num`.
@@ -211,7 +226,14 @@ proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
 ##
 ## If you want to convert the returned value to a different time measurement,
 ## use one of the functions: `msecs()`, `usecs()` or `secs()`.
+##
+## If lapping is not enabled then this will return 0
 proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
+  # Check for not lapping
+  if sw.laps.addr == nil:
+    return 0
+
+  # Else we've got laps
   if incCur and sw.running:
     # Check if the index is good or not
     if num < sw.laps.len:
@@ -244,7 +266,14 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 ##   var lapsSecs = sw2.laps.map(proc(x: int64): float = secs(x))
 ##   echo lapsSecs
 ##   # --> @[1.000117, 0.500115, 0.200212]
+##
+## If lapping is turned off this will return `nil`.
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
+  # Check for lapping=off
+  if sw.laps.addr == nil:
+    return nil
+
+  # Nope, we've got laps
   var
     curLap = sw.nsecs
     allLaps = cast[seq[int64]](sw.laps)
@@ -256,8 +285,14 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
 
 
 ## Removes a lap from the Stopwatch's record with the given index of `num`.
-## This function has the possibility of raising an `IndexError`.  
+## This function has the possibility of raising an `IndexError`.
+##
+## If lapping is disabled, this function will do nothing.
 proc rmLap*(sw: var Stopwatch; num: int) =
+  # Check for no laps
+  if sw.laps.addr == nil:
+    return
+
   # Remove its time from the accum
   let t = sw.laps[num]
   sw.total = sw.total.Ticks - t
@@ -267,7 +302,13 @@ proc rmLap*(sw: var Stopwatch; num: int) =
 
 ## This clears out all of the lap records from a Stopwatch.  This will not
 ## effect the current lap (if one is being measured).
+##
+## If lapping is disabled nothing will happen.
 proc clearLaps(sw: var Stopwatch) =
+  # Check for no laps
+  if sw.laps.addr == nil:
+    return
+
   sw.laps.setLen(0)
   sw.total = 0
 
@@ -276,6 +317,8 @@ proc clearLaps(sw: var Stopwatch) =
 ## been called, or the time of the previously measured lap.  The return value is
 ## in nanoseconds.  If no laps have been run yet, then this will return 0.
 ##
+## If lapping is turned off then this will act the same as `totalNsecs()`
+##
 ## See also: `usecs()`, `msecs()`, `secs()`
 proc nsecs*(sw: var Stopwatch): int64 =
   let curTicks = getTicks_internal()
@@ -283,6 +326,9 @@ proc nsecs*(sw: var Stopwatch): int64 =
   if sw.running:
     # Return current lap
     return (curTicks - sw.startTicks).int64
+  elif sw.laps.addr == nil:
+    # Lapping is off
+    return sw.totalNsecs()
   elif sw.laps.len != 0:
     # Return previous lap
     return sw.laps[high(sw.laps)].int64
