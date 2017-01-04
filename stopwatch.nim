@@ -24,7 +24,8 @@ proc secs*(nsecs: int64): float {.inline.}
 type
   Stopwatch* = object
     running: bool
-    startTicks: Ticks 
+    startTicks: Ticks
+    recordLaps: bool
     laps: seq[Ticks]
     total: Nanos
 
@@ -38,7 +39,7 @@ proc reset*(sw: var Stopwatch) {.inline.}
 proc restart*(sw: var Stopwatch) {.inline.}
 
 # Lap functions
-proc isRecordingLaps(sw: var Stopwatch;): bool {.inline.}
+proc isRecordingLaps*(sw: var Stopwatch;): bool {.inline.}
 proc numLaps*(sw: var Stopwatch; incCur: bool = false): int {.inline.}
 proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 {.inline.}
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] {.inline.}
@@ -131,6 +132,7 @@ proc stopwatch*(enableLapping:bool): Stopwatch =
   result = Stopwatch(
     running: false,
     startTicks: 0.Ticks,
+    recordLaps: enableLapping,
     laps: if enableLapping: @[] else: nil,
     total: 0
   )
@@ -142,6 +144,7 @@ proc clone*(sw: var Stopwatch): Stopwatch =
   result = Stopwatch(
     running: sw.running,
     startTicks: sw.startTicks,
+    recordLaps: sw.recordLaps,
     laps: sw.laps,
     total: sw.total
   )
@@ -210,8 +213,8 @@ proc restart*(sw: var Stopwatch) =
 
 ## Checks to see if a stopwatch it recording laps or not.  Returns true if so,
 ## false otherwise
-proc isRecordingLaps(sw: var Stopwatch;): bool =
-  return sw.laps.addr != nil
+proc isRecordingLaps*(sw: var Stopwatch;): bool =
+  return sw.recordLaps
 
 ## Returns the number of laps the Stopwatch has recorded so far.  If `incCur` is
 ## set to `true`, it will include the current lap in the count.  By default it
