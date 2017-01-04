@@ -38,6 +38,7 @@ proc reset*(sw: var Stopwatch) {.inline.}
 proc restart*(sw: var Stopwatch) {.inline.}
 
 # Lap functions
+proc isRecordingLaps(sw: var Stopwatch;): bool {.inline.}
 proc numLaps*(sw: var Stopwatch; incCur: bool = false): int {.inline.}
 proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 {.inline.}
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] {.inline.}
@@ -177,7 +178,7 @@ proc stop*(sw: var Stopwatch) =
   let lapTime = stopTicks - sw.startTicks
 
   # Save it to the laps
-  if sw.laps.addr != nil:
+  if sw.isRecordingLaps:
     sw.laps.add(lapTime.Ticks)
 
   # Add it to the accum
@@ -196,7 +197,7 @@ proc reset*(sw: var Stopwatch) =
   sw.total = 0        # Zero the accum
 
   # Clear the laps
-  if sw.laps.addr != nil:
+  if sw.isRecordingLaps:
     sw.laps.setLen(0)
 
 
@@ -207,13 +208,18 @@ proc restart*(sw: var Stopwatch) =
   sw.start()
 
 
+## Checks to see if a stopwatch it recording laps or not.  Returns true if so,
+## false otherwise
+proc isRecordingLaps(sw: var Stopwatch;): bool =
+  return sw.laps.addr != nil
+
 ## Returns the number of laps the Stopwatch has recorded so far.  If `incCur` is
 ## set to `true`, it will include the current lap in the count.  By default it
 ## set to `false`.
 ##
 ## If lapping is not enabled, this will 0
 proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
-  if sw.laps.addr != nil:
+  if sw.isRecordingLaps:
     return sw.laps.len + (if incCur and sw.running: 1 else: 0)
   else:
     return 0
@@ -230,7 +236,7 @@ proc numLaps*(sw: var Stopwatch; incCur: bool = false): int =
 ## If lapping is not enabled then this will return 0
 proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
   # Check for not lapping
-  if sw.laps.addr == nil:
+  if not sw.isRecordingLaps:
     return 0
 
   # Else we've got laps
@@ -270,7 +276,7 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 ## If lapping is turned off this will return `nil`.
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
   # Check for lapping=off
-  if sw.laps.addr == nil:
+  if not sw.isRecordingLaps:
     return nil
 
   # Nope, we've got laps
@@ -290,7 +296,7 @@ proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
 ## If lapping is disabled, this function will do nothing.
 proc rmLap*(sw: var Stopwatch; num: int) =
   # Check for no laps
-  if sw.laps.addr == nil:
+  if not sw.isRecordingLaps:
     return
 
   # Remove its time from the accum
@@ -306,7 +312,7 @@ proc rmLap*(sw: var Stopwatch; num: int) =
 ## If lapping is disabled nothing will happen.
 proc clearLaps(sw: var Stopwatch) =
   # Check for no laps
-  if sw.laps.addr == nil:
+  if not sw.isRecordingLaps:
     return
 
   sw.laps.setLen(0)
@@ -326,7 +332,7 @@ proc nsecs*(sw: var Stopwatch): int64 =
   if sw.running:
     # Return current lap
     return (curTicks - sw.startTicks).int64
-  elif sw.laps.addr == nil:
+  elif not sw.isRecordingLaps:
     # Lapping is off
     return sw.totalNsecs()
   elif sw.laps.len != 0:
