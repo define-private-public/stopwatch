@@ -281,11 +281,11 @@ proc lap*(sw: var Stopwatch; num: int; incCur: bool = false): int64 =
 ##   echo lapsSecs
 ##   # --> @[1.000117, 0.500115, 0.200212]
 ##
-## If lapping is turned off this will return `nil`.
+## If lapping is turned off this will return an empty sequence
 proc laps*(sw: var Stopwatch; incCur: bool = false): seq[int64] =
   # Check for lapping=off
   if not sw.isRecordingLaps:
-    return nil
+    return @[]
 
   # Nope, we've got laps
   var
