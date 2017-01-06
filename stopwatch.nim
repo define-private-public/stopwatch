@@ -89,7 +89,7 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
 #====================#
 
 
-when defined(macosx):
+when defined(macosx) or defined(js):
   # For OS X
   from times import epochTime
 
