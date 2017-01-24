@@ -1,7 +1,13 @@
 import stopwatch
-import parseopt2
-from os import sleep
 from sequtils import map
+
+# Choose where to get the "sleep" function from
+when defined(js):
+  proc sleep(ms: int) =
+    {.emit: ["function sleep(", ms, ") { var currentTime = new Date().getTime(); while (currentTime + ", ms, " >= new Date().getTime()) { } }" ].}
+else:
+  from os import sleep
+  import parseopt2
 
 
 var
@@ -9,10 +15,11 @@ var
   sw:Stopwatch
 
 
-# Test with laps or no laps via an argument
-for kind, key, val in getopt():
-  if (kind == cmdArgument) and (key == "nolap"):
-    recordLaps = false
+# Test with laps or no laps via an argument (non-js only)
+when not defined(js):
+  for kind, key, val in getopt():
+    if (kind == cmdArgument) and (key == "nolap"):
+      recordLaps = false
 
 
 # Print a message
