@@ -84,6 +84,16 @@ let micros = sw.totalUsecs
 let lapsSecs = sw.laps.map(proc(x: int64): float = secs(x))
 ```
 
+JavaScript Target
+-----------------
+
+This library does support the Nim compiler's experimental JavaScript target.
+Though note that it's experimental as well.  I had some issues with my `sleep()`
+function in my `tester.nim` file for targeting both browser JS and NodeJS
+javascript.  As far as I can tell, how the Stopwatch gets/recorcds time in the
+JS target should be correct.  I'd like to get some help though with testing (and
+writing JavaScript).
+
 
 Other Notes
 -----------

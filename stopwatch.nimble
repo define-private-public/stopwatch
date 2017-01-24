@@ -1,6 +1,6 @@
 [Package]
 name          = "stopwatch"
-version       = "3.1"
+version       = "3.2"
 author        = "define-private-public"
 description   = "A simple timing library for benchmarking code and other things."
 license       = "MIT"
