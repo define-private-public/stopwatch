@@ -88,8 +88,17 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
 #== Internal Procs ==#
 #====================#
 
-
-when defined(macosx) or defined(js):
+# This needs to choose a different getTicks_internal() function depending upon 
+# the target platform.
+when defined(js) and not defined(nodejs):
+  # For browser JS
+  proc getTicks_internal(): Ticks =
+    {.emit: ["return performance.now() * 1000000;"].}
+when defined(nodejs):
+  # For NodeJS Targets
+  proc getTicks_internal(): Ticks =
+    {.emit: ["return process.hrtime()[1];"].}
+when defined(macosx):
   # For OS X
   from times import epochTime
 
