@@ -3,7 +3,8 @@ from sequtils import map
 
 # Choose where to get the "sleep" function from
 when defined(js):
-
+  
+  # NOTE: This isn't giving me the result I want...
   proc sleep(ms: int) =
     {.emit: ["return new Promise(resolve => setTimeout(resolve,", ms, "));"].}
 else:
@@ -109,7 +110,9 @@ when defined(js) and not defined(nodejs):
   # Call test inside body.onload for browser JS
   dom.window.onload = proc(e: dom.Event) =
     test()
-
+elif defined(nodejs):
+  # No CLI args either
+  test()
 else:
   for kind, key, val in getopt():
     if (kind == cmdArgument) and (key == "nolap"):

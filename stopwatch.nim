@@ -94,16 +94,19 @@ when defined(js) and not defined(nodejs):
   # For browser JS
   proc getTicks_internal(): Ticks =
     {.emit: ["return performance.now() * 1000000;"].}
-when defined(nodejs):
+
+elif defined(nodejs):
   # For NodeJS Targets
   proc getTicks_internal(): Ticks =
     {.emit: ["return process.hrtime()[1];"].}
-when defined(macosx):
+
+elif defined(macosx):
   # For OS X
   from times import epochTime
 
   proc getTicks_internal(): Ticks= 
     return (epochTime() * 1_000_000_000).Ticks
+
 else:
   # For Linux & Windows
   proc getTicks_internal(): Ticks= 
