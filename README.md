@@ -88,11 +88,11 @@ JavaScript Target
 -----------------
 
 This library does support the Nim compiler's experimental JavaScript target.
-Though note that it's experimental as well.  I had some issues with my `sleep()`
-function in my `tester.nim` file for targeting both browser JS and NodeJS
-javascript.  As far as I can tell, how the Stopwatch gets/recorcds time in the
-JS target should be correct.  I'd like to get some help though with testing (and
-writing JavaScript).
+Though note that it's experimental as well.  Unfortunatley, Nim's JS target
+doesn't really support 64 bit integers that well, the JS version only has
+millisecond level resolution.  I also had to remove some of the functions that
+used microseconds and nanoseconds.  Hopefully this will be imporoved in soon
+release.
 
 
 Other Notes
