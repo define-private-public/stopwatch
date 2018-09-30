@@ -143,7 +143,7 @@ proc stopwatch*(enableLapping:bool): Stopwatch =
     startTicks: 0.Ticks,
     recordLaps: enableLapping,
     previousLap: 0.Ticks,
-    laps: if enableLapping: @[] else: nil,
+    laps: @[],
     total: 0
   )
 
