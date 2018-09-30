@@ -78,7 +78,7 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
 #== Internal Procs ==#
 #====================#
 
-# This needs to choose a different getTicks_internal() function depending upon 
+# This needs to choose a different getTicks_internal() function depending upon
 # the target platform.
 proc getTicks_internal(): Ticks =
   {.emit: ["return performance.now();"].}
@@ -345,4 +345,3 @@ proc totalMsecs*(sw: var Stopwatch): int =
 ## float).
 proc totalSecs*(sw: var Stopwatch): float =
   return secs(sw.totalMsecs)
-

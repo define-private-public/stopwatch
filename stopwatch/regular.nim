@@ -84,7 +84,7 @@ template bench*(sw: Stopwatch; body: untyped): untyped =
 #== Internal Procs ==#
 #====================#
 
-# This needs to choose a different getTicks_internal() function depending upon 
+# This needs to choose a different getTicks_internal() function depending upon
 # the target platform.
 when defined(js) and not defined(nodejs):
   # For browser JS
@@ -100,12 +100,12 @@ elif defined(macosx):
   # For OS X
   from times import epochTime
 
-  proc getTicks_internal(): Ticks= 
+  proc getTicks_internal(): Ticks=
     return (epochTime() * 1_000_000_000).Ticks
 
 else:
   # For Linux & Windows
-  proc getTicks_internal(): Ticks= 
+  proc getTicks_internal(): Ticks=
     return getTicks()
 
 
@@ -415,4 +415,3 @@ proc totalMsecs*(sw: var Stopwatch): int64 =
 ## See also: `totalNsecs()`, `totalUsecs()`, `totalMsecs()`
 proc totalSecs*(sw: var Stopwatch): float =
   return secs(sw.totalNsecs)
-
