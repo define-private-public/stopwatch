@@ -21,7 +21,7 @@ type
   Stopwatch* = object
     running: bool
     startTicks: Ticks
-    recordLaps: bool
+    recordLaps*: bool
     previousLap: Ticks
     laps: seq[Ticks]
     total: Nanos
