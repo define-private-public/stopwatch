@@ -1,5 +1,5 @@
 # Package
-version       = "3.5"
+version       = "3.6"
 author        = "define-private-public"
 description   = "A simple timing library for benchmarking code and other things."
 license       = "MIT"
